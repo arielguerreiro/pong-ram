@@ -13,15 +13,15 @@ class Bar:
 	def draw(self, screen, color = (255,255,255)):
 		pygame.draw.rect(screen, color, [self.x-self.width/2, self.y-self.lenght/2, self.width, self.lenght])
 
-	def move(self, mode='human', move=None): #mode = (human, machine, enemy); move = (0,1,2)
+	def move(self, mode='human', move=None, ball = None): #mode = (human, machine, enemy); move = (0,1,2)
 		lookup_table = {pygame.K_s : lambda x: x + self.velocity,
 						1 : lambda x: x + self.velocity, # movimentamos a barra verticalmente
 						pygame.K_w : lambda x: x - self.velocity,
 						2 : lambda x: - + self.velocity} # conforme a tabela indica
 
-		pressed = pygame.key.get_pressed()
 
 		if mode == 'human':
+			pressed = pygame.key.get_pressed()
 			for k in lookup_table.keys(): # verificamos se a tecla foi apertada
 				if pressed[k]:
 					self.y = lookup_table[k](self.y)
@@ -30,6 +30,8 @@ class Bar:
 			if move != 0:
 				self.y = lookup_table[move](self.y)
 
+		elif mode == 'enemy':
+			self.y += self.velocity*(ball.y - self.y/abs(ball.y - self.y))
 
 
 class Ball:
@@ -55,29 +57,45 @@ class Ball:
 
 class Environment:
 	def __init__(self, HEIGHT=600, WIDTH=800, bar_velocity=2, ball_velocity=1):
+
 		bar_parameters = [(15,50,100,5,bar_velocity,0),(WIDTH-15,50,100,5,bar_velocity,0),
 				  (WIDTH/2,0,2,WIDTH,0,1),(WIDTH/2,HEIGHT,2,WIDTH,0,1),
 				  (0,HEIGHT/2,HEIGHT,2,0,0),(WIDTH,HEIGHT/2,HEIGHT,2,0,0)]
 
+		self.HEIGHT = HEIGHT
+		self.WIDTH = WIDTH
+
 		self.bars = []
 		for bar in bar_parameters:
-			bars.append(Bar(bar[0],bar[1],bar[2],bar[3],bar[4],orientation=bar[-1]))
-		self.control_bar = bars[0]
-		self.other_bar = bars[1]
+			self.bars.append(Bar(bar[0],bar[1],bar[2],bar[3],bar[4],orientation=bar[-1]))
+		self.control_bar = self.bars[0]
+		self.other_bar = self.bars[1]
 
 		self.ball = Ball(WIDTH/2,HEIGHT/2,10,ball_velocity) #x inicial; y inicial; raio; velocidade
 		self.score = [0,0]
 		self.done = False
 
 	def reset(self):
-		return ([self.control_bar.x, self.control_bar.y, self.ball.x, self.ball.y, self.ball.velocity], 0, self.done, '_')
+		self.ball.x = self.ball.y = 0
+		self.ball.velocity = [abs(self.ball_velocity[0]),abs(self.ball_velocity[1])]
+		return ([self.control_bar.x, self.control_bar.y, self.ball.x, self.ball.y, self.ball.velocity[0],self.bell.velocity[1]], 0, self.done, '_')
 
 	def step(self,action):
+		reward = 0
 		self.control_bar.move(mode='machine',move=action)
-		self.other_bar.move() # adicionar o movimento da outra barra
+		self.other_bar.move(mode='enemy',ball=self.ball)
 		self.ball.move()
 		for bar in self.bars:
 			self.ball.bounce(bar)
-		# adicionar score e condição de finalização
-		return ([self.control_bar.x, self.control_bar.y, self.ball.x, self.ball.y, self.ball.velocity], reward, self.done, '_')
+		if self.ball.x <= 4:
+			self.score[-1] += 1
+			reward = -1
+			self.ball.x = ball.y = 0
+			self.ball.velocity[0], self.ball.velocity[1] = [abs(self.ball.velocity[0]),-abs(self.ball.velocity[0])]
+		elif self.ball.x >= self.WIDTH - 4:
+			reawrd = 1
+			self.score[0] += 1
+			self.ball.x = ball.y = 0
+			self.ball.velocity[0], self.ball.velocity[1] = [abs(self.ball.velocity[0]),abs(self.ball.velocity[0])]
+		return ([self.control_bar.x, self.control_bar.y, self.ball.x, self.ball.y, self.ball.velocity[0],self.ball.velocity[1]], reward, self.done, '_')
 
