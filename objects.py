@@ -1,5 +1,5 @@
 import pygame
-import numpy
+import numpy as np
 
 class Bar:
 	def __init__(self, x, y, lenght = 20, width = 2, velocity = 2, orientation = 1):
@@ -17,7 +17,7 @@ class Bar:
 		lookup_table = {pygame.K_s : lambda x: x + self.velocity,
 						1 : lambda x: x + self.velocity, # movimentamos a barra verticalmente
 						pygame.K_w : lambda x: x - self.velocity,
-						2 : lambda x: - + self.velocity} # conforme a tabela indica
+						2 : lambda x: x + self.velocity} # conforme a tabela indica
 
 
 		if mode == 'human':
@@ -31,7 +31,9 @@ class Bar:
 				self.y = lookup_table[move](self.y)
 
 		elif mode == 'enemy':
-			self.y += self.velocity*(ball.y - self.y/abs(ball.y - self.y))
+			if self.y != ball.y and np.random.random() < .8: vec = ((ball.y - self.y)/abs(ball.y - self.y))
+			else: vec = np.random.choice([0,-1])
+			self.y += self.velocity*vec
 
 
 class Ball:
@@ -72,13 +74,15 @@ class Environment:
 		self.other_bar = self.bars[1]
 
 		self.ball = Ball(WIDTH/2,HEIGHT/2,10,ball_velocity) #x inicial; y inicial; raio; velocidade
-		self.score = [0,0]
-		self.done = False
 
 	def reset(self):
-		self.ball.x = self.ball.y = 0
-		self.ball.velocity = [abs(self.ball_velocity[0]),abs(self.ball_velocity[1])]
-		return ([self.control_bar.x, self.control_bar.y, self.ball.x, self.ball.y, self.ball.velocity[0],self.bell.velocity[1]], 0, self.done, '_')
+		self.ball.x, self.ball.y = self.WIDTH/2, self.HEIGHT/2
+		self.control_bar.x, self.control_bar.y = 15,50
+		self.other_bar.x, self.other_bar.y = self.WIDTH - 15,50
+		self.ball.velocity = [abs(self.ball.velocity[0]),abs(self.ball.velocity[1])]
+		self.done = False
+		self.score = [0,0]
+		return [self.control_bar.x, self.control_bar.y, self.ball.x, self.ball.y, self.ball.velocity[0],self.ball.velocity[1]]
 
 	def step(self,action):
 		reward = 0
@@ -88,14 +92,19 @@ class Environment:
 		for bar in self.bars:
 			self.ball.bounce(bar)
 		if self.ball.x <= 4:
+			temp = self.score
+			self.reset()
+			self.score = temp
 			self.score[-1] += 1
 			reward = -1
-			self.ball.x = ball.y = 0
-			self.ball.velocity[0], self.ball.velocity[1] = [abs(self.ball.velocity[0]),-abs(self.ball.velocity[0])]
 		elif self.ball.x >= self.WIDTH - 4:
-			reawrd = 1
+			temp = self.score
+			self.reset()
+			self.score = temp
 			self.score[0] += 1
-			self.ball.x = ball.y = 0
-			self.ball.velocity[0], self.ball.velocity[1] = [abs(self.ball.velocity[0]),abs(self.ball.velocity[0])]
+			reward = 1
+		if reward == -1:
+			print(self.score)
+			self.done = True
 		return ([self.control_bar.x, self.control_bar.y, self.ball.x, self.ball.y, self.ball.velocity[0],self.ball.velocity[1]], reward, self.done, '_')
 
