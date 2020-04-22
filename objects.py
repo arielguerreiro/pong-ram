@@ -33,7 +33,7 @@ class Bar:
 				self.y = lookup_table[move](self.y)
 
 		elif mode == 'enemy':
-			if self.y != ball.y and np.random.random() < .6 and ball.x >= 400: vec = ((ball.y - self.y)/abs(ball.y - self.y))
+			if self.y != ball.y and np.random.random() < .4 and ball.x >= 400: vec = ((ball.y - self.y)/abs(ball.y - self.y))
 			else: vec = 0
 			self.y += self.velocity*vec
 
@@ -64,7 +64,7 @@ class Ball:
 class Environment:
 	def __init__(self, HEIGHT=600, WIDTH=800, bar_velocity=3, max_steps = 1000000):
 
-		bar_parameters = [(15,50,100,5,bar_velocity,0),(WIDTH-15,50,100,5,5,0),
+		bar_parameters = [(15,50,100,5,bar_velocity,0),(WIDTH-15,50,100,5,3,0),
 				  (WIDTH/2,0,2,WIDTH,0,1),(WIDTH/2,HEIGHT,2,WIDTH,0,1),
 				  (0,HEIGHT/2,HEIGHT,2,0,0),(WIDTH,HEIGHT/2,HEIGHT,2,0,0)]
 
@@ -137,7 +137,7 @@ class Environment:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				self.done = True
-		self.screen.fill((255,100,100))
+		self.screen.fill((100,100,100))
 		for bar in self.bars:
 			bar.draw(self.screen)
 		self.ball.draw(self.screen)

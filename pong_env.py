@@ -23,7 +23,7 @@ while running:
 		if event.type == pygame.QUIT:
 			running = False
 
-	screen.fill((255,100,100))
+	screen.fill((100,100,100))
 
 	for bar in bars:
 		bar.draw(screen)

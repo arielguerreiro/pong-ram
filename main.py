@@ -8,7 +8,7 @@ gamma = 0.9  #fator de desconto
 decay = 0.999999 #decaímento do epsilon
 N_EPISODES = 800
 times = []
-Q = {}
+Q = {} # keys: estados; values: valor atribuido à cada ação
 
 env = Environment()
 for i_episode in range(N_EPISODES):
@@ -29,7 +29,7 @@ for i_episode in range(N_EPISODES):
         total_reward += r
         #O novo estado é salvo numa nova variavel
         #equação de Bellman
-        if s not in Q.keys(): Q[s] = [0,0,0]
+        if s not in Q.keys(): Q[s] = [0,0,0] # para cada estado ainda não descoberto, iniciamos seu valor como nulo
         if s2 not in Q.keys(): Q[s2] = [0,0,0]        	
 
         Q[s][action] = Q[s][action] + a*(r + gamma*np.max(Q[s2]) - Q[s][action])
