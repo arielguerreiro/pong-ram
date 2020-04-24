@@ -1,7 +1,9 @@
 import pickle
 import numpy as np
 from objects import Environment
-from main import discretize
+
+def discretize(s):
+    return tuple(round(i/10) for i in s)
 
 def load_table(file):
 	with open(file, 'rb') as pickle_in:
