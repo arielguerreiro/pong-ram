@@ -53,7 +53,7 @@ class Ball:
 		self.x = int(x)
 		self.y = int(y)
 		self.radius = radius
-		rr = [(0.75,1.5),(-1,1),(1.5,0.75),(1,0.5)]
+		rr = [(-1,1)]
 		r = np.random.choice(range(len(rr)))
 		self.velocity = [rr[r][0],rr[r][1]]
 
@@ -97,7 +97,7 @@ class Environment:
 		self.steps = 0
 		self.control_bar.x, self.control_bar.y = 15,50
 		self.other_bar.x, self.other_bar.y = self.WIDTH - 15,50
-		rr = [(0.75,1.5),(-1,1),(1.5,0.75),(1,0.5)]
+		rr = [(-1,1)]
 		r = np.random.choice(range(len(rr)))
 		self.ball.velocity = [rr[r][0],rr[r][1]]
 		self.done = False
