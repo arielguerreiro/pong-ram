@@ -3,16 +3,6 @@ from objects import Environment
 import pickle
 import matplotlib.pyplot as plt
 
-
-a = 0.05 #learning rate
-e_min = 0.01
-e = 0.7 # epsilon
-gamma = 0.9  # fator de desconto
-decay = 0.9999999 # decaímento do epsilon
-N_EPISODES = 1000
-times = []
-Q = {} # keys: estados; values: valor atribuido à cada ação
-
 def discretize(s):
     return tuple(round(i/10) for i in s)
 
@@ -37,6 +27,16 @@ def train(state, action, reward, next_state):
     Q[s][action] = Q[s][action] + a*(r + gamma*np.max(Q[s2]) - Q[s][action])
         
 def main():
+	
+	a = 0.05 #learning rate
+	e_min = 0.01
+	e = 0.7 # epsilon
+	gamma = 0.9  # fator de desconto
+	decay = 0.9999999 # decaímento do epsilon
+	N_EPISODES = 1000
+	times = []
+	Q = {} # keys: estados; values: valor atribuido à cada ação
+
 	env = Environment()
 	rewards = []
 	for i_episode in range(1,N_EPISODES+1):
